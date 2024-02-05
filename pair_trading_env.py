@@ -34,7 +34,7 @@ class PairtradingEnv(gym.Env):
     Reward:
         Reward: the difference of portfolio at the current day and the previous day 
     Starting State:
-        Choose randly one day in the historic data as the starting point and we have 
+        Choose randomly one day in the historic data as the starting point and we have 
         [price of stock1, 0, price of stock2, 0, 10000]
     Episode Termination:
         Arriving the end of the historic data or satisfying the maximum trade period
@@ -53,7 +53,8 @@ class PairtradingEnv(gym.Env):
         
         self.stock1 = stock1
         self.stock2 = stock2
-        self.portfolio = portfolio(cash)
+        self.cash = cash
+        self.portfolio = portfolio(self.cash)
 
         self.observation_space = np.zeros(5)
         self.action_space = 4
@@ -105,7 +106,7 @@ class PairtradingEnv(gym.Env):
         old_value = self.portfolio.value    
         self.portfolio.updatePrice(stock1_price, stock2_price)
         # reward = self.portfolio.value / old_value - 1.0 
-        reward = self.portfolio.value / 10000 - 1.0 
+        reward = self.portfolio.value / self.cash - 1.0 
         # reward *= 100
 
  
@@ -137,7 +138,7 @@ class PairtradingEnv(gym.Env):
             self.portfolio.cash]), reward, done, {}
 
     def reset(self, test=False):
-        self.portfolio = portfolio(cash=10000)
+        self.portfolio = portfolio(cash=self.cash)
 
         # if not test:
         self.start_trade_time = np.random.randint(self.total_trade_period-self.max_trade_period-5, size=1)[0]
