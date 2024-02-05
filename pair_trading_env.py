@@ -25,9 +25,12 @@ class PairtradingEnv(gym.Env):
         Num	Action
         stock1_act: the ratio of stock1 to sell/buy ;
         stock2_act: the ratio of stock2 to sell/buy  ;
-        trade_flag: 0 (sell stock 1 based on stock1_act, buy stock 2 based on stock2_act),
-                    1 (sell stock 2 based on stock1_act, buy stock 1 based on stock2_act),
-                    2 (sell all stock 1 and stock 2 in hand);
+        trade_flag : 
+            0: open position, 
+            1: close position, 
+            2: add position, 
+            3 : close position and open position of another direction
+            4 : do nothing
         
         Note: we only have three possible actions to deal with pair trading, i.e., 
         buy stock1, sell stock2; buy stock2, sell stock 1; sell all the stocks in hand
@@ -57,7 +60,7 @@ class PairtradingEnv(gym.Env):
         self.portfolio = portfolio(self.cash)
 
         self.observation_space = np.zeros(5)
-        self.action_space = 4
+        self.action_space = 5
         self.trade_info = None
 
         self.total_trade_period = len(stock1)
@@ -93,6 +96,7 @@ class PairtradingEnv(gym.Env):
             1: close position, 
             2: add position, 
             3 : close position and open position of another direction
+            4 : do nothing
         '''
 
         stock1_num, stock2_num, trade_flag = action
@@ -120,6 +124,8 @@ class PairtradingEnv(gym.Env):
             self.portfolio.closePosition()
             self.portfolio.updatePrice(stock1_price, stock2_price)
             self.portfolio.openPosition(num1 = stock1_num, num2 = stock2_num)
+        elif trade_flag == 4:
+            _ = None
 
 
         done = False
